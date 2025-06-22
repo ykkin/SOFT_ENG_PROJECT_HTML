@@ -61,27 +61,29 @@ app.post('/api/payment', async (req, res) => {
   // Items specify the amount, name, and quantity
   // the subtotals and total are already computed by the system so only the base price is needed
   // request body should be in this format {id:1, line_items: [{"name":"name", "amount":100, "quantity":1}]}
-  valid = true
+  let valid = true;
+  let line_items = [];
+
   if (Array.isArray(req.body.line_items)) {
-    line_items = req.body.line_items
+    line_items = req.body.line_items;
     for (var i = 0; i < line_items.length; i++) {
-      if (!line_items[i].name | !line_items[i].amount | !line_items[i].quantity) {
-        valid = false
-        break
+      if (!line_items[i].name || !line_items[i].amount || !line_items[i].quantity) {
+        valid = false;
+        break;
       }
-      if (line_items[i].amount <= 0 | line_items[i].quantity <= 0) {
-        valid = false
-        break
+      if (line_items[i].amount <= 0 || line_items[i].quantity <= 0) {
+        valid = false;
+        break;
       }
       line_items[i].currency = "PHP";
       line_items[i].amount = line_items[i].amount * 100;
     }
-  }else {
-    valud = false;
+  } else {
+    valid = false;
   }
 
   if (!valid) {
-    res.status(400).send('Bad Request! Please provide all the necessary information');
+    return res.status(400).send('Bad Request! Please provide all the necessary information');
   }
 
   const options = {
@@ -106,18 +108,20 @@ app.post('/api/payment', async (req, res) => {
   };
 
   fetch('https://api.paymongo.com/v1/checkout_sessions', options)
-  .then(response => response.json())
-  .then(response => {
-    pool.query(`INSERT INTO payment_sessions (paymongo_id, cart_id) VALUES ('${response.data.id}', ${req.body.id}) ON CONFLICT DO NOTHING`).then(result => {
-      res.status(200).send(response.data.attributes.checkout_url);
-    });
-  }).catch(err => res.status(400).send('Paymongo request failed!'));
+    .then(response => response.json())
+    .then(response => {
+      pool.query(`INSERT INTO payment_sessions (paymongo_id, cart_id) VALUES ('${response.data.id}', ${req.body.id}) ON CONFLICT DO NOTHING`).then(result => {
+        res.status(200).send(response.data.attributes.checkout_url);
+      });
+    }).catch(err => res.status(400).send('Paymongo request failed!'));
 });
 
 app.post('/api/payment/successful', (req, res) => {
-  id = res.body.data.attributes.data.id;
-  pool.query(`UPDATE payment_sessions SET paid = true WHERE paymongo_id = '${id}'`).then(result => console.log(Payment succesful!));
-  res.status(200).send('Payment successful!')
+  const id = req.body.data.attributes.data.id;
+  pool.query(`UPDATE payment_sessions SET paid = true WHERE paymongo_id = '${id}'`).then(result => {
+    console.log('Payment successful!');
+    res.status(200).send('Payment successful!');
+  });
 });
 
 // --- Root Route ---
