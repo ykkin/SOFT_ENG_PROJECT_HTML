@@ -108,7 +108,7 @@ app.post('/api/payment', async (req, res) => {
   fetch('https://api.paymongo.com/v1/checkout_sessions', options)
   .then(response => response.json())
   .then(response => {
-    pool.query(INSERT INTO payment_sessions (paymongo_id, cart_id) VALUES ('${response.data.id}', ${req.body.id}) ON CONFLICT DO NOTHING).then(result => {
+    pool.query(`INSERT INTO payment_sessions (paymongo_id, cart_id) VALUES ('${response.data.id}', ${req.body.id}) ON CONFLICT DO NOTHING`).then(result => {
       res.status(200).send(response.data.attributes.checkout_url);
     });
   }).catch(err => res.status(400).send('Paymongo request failed!'));
@@ -116,7 +116,7 @@ app.post('/api/payment', async (req, res) => {
 
 app.post('/api/payment/successful', (req, res) => {
   id = res.body.data.attributes.data.id;
-  pool.query(UPDATE payment_sessions SET paid = true WHERE paymongo_id = '${id}').then(result => console.log(Payment succesful!));
+  pool.query(`UPDATE payment_sessions SET paid = true WHERE paymongo_id = '${id}'`).then(result => console.log(Payment succesful!));
   res.status(200).send('Payment successful!')
 });
 
