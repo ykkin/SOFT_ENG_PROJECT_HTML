@@ -1,12 +1,15 @@
-// db.js
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'postgres',
-  password: 'wingsnthings',
+  host: "aws-0-ap-southeast-1.pooler.supabase.com",
   port: 5432,
+  database: "postgres",
+  user: "postgres.heceotsazrqtejxmbsux",
+  pool_mode: "session",
+  password: "NickMakinoBitch",
+  ssl: {
+    rejectUnauthorized: false  // required by Supabase
+  }
 });
 
-module.exports = pool;
+module.exports = pool
