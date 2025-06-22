@@ -117,6 +117,7 @@ app.post('/api/payment', async (req, res) => {
 });
 
 app.post('/api/payment/successful', (req, res) => {
+  console.log(req.body);
   const id = req.body.data.attributes.data.id;
   pool.query(`UPDATE payment_sessions SET paid = true WHERE paymongo_id = '${id}'`).then(result => {
     console.log('Payment successful!');
