@@ -57,111 +57,72 @@ app.get('/api/cart', async (req, res) => {
 
 // --- PayMongo Integration ---
 
-const PAYMONGO_SECRET = process.env.PAYMONGO_SECRET_KEY;
-const PAYMONGO_HEADERS = {
-  headers: {
-    Authorization: 'Basic ' + Buffer.from(PAYMONGO_SECRET + ':').toString('base64'),
-    'Content-Type': 'application/json'
-  }
-};
-
-// Create Payment Intent
 app.post('/api/payment', async (req, res) => {
-  const {
-    name,
-    email,
-    address,
-    city,
-    province,
-    postal,
-    cardNumber,
-    expiry,
-    cvc,
-    cart
-  } = req.body;
+  // Items specify the amount, name, and quantity
+  // the subtotals and total are already computed by the system so only the base price is needed
+  // request body should be in this format {id:1, line_items: [{"name":"name", "amount":100, "quantity":1}]}
+  let valid = true;
+  let line_items = [];
 
-  // Validate input data
-  if (!name || !email || !address || !city || !province || !postal || !cardNumber || !expiry || !cvc || !cart || cart.length === 0) {
-    return res.status(400).json({ error: 'Missing required payment details or empty cart' });
+  if (Array.isArray(req.body.line_items)) {
+    line_items = req.body.line_items;
+    for (var i = 0; i < line_items.length; i++) {
+      if (!line_items[i].name || !line_items[i].amount || !line_items[i].quantity) {
+        valid = false;
+        break;
+      }
+      if (line_items[i].amount <= 0 || line_items[i].quantity <= 0) {
+        valid = false;
+        break;
+      }
+      line_items[i].currency = "PHP";
+      line_items[i].amount = line_items[i].amount * 100;
+    }
+  } else {
+    valid = false;
   }
 
-  try {
-    // Parse expiry MM/YY
-    const [exp_month, exp_yearShort] = expiry.split('/');
-    const exp_year = 2000 + parseInt(exp_yearShort);
-
-    // Step 1: Create Payment Method (card)
-    const paymentMethodResponse = await axios.post(
-      'https://api.paymongo.com/v1/payment_methods',
-      {
-        data: {
-          attributes: {
-            details: {
-              card_number: cardNumber.replace(/\s+/g, ''), // remove spaces
-              exp_month: parseInt(exp_month),
-              exp_year: exp_year,
-              cvc: cvc
-            },
-            type: 'card'
-          }
-        }
-      },
-      PAYMONGO_HEADERS
-    );
-
-    const paymentMethodId = paymentMethodResponse.data.data.id;
-
-    // Calculate total amount in centavos (PHP smallest currency unit)
-    const total = cart.reduce((sum, item) => sum + item.subtotal, 0);
-    const amount = Math.round(total * 100); // assuming subtotal is in pesos
-
-    // Step 2: Create Payment Intent
-    const paymentIntentResponse = await axios.post(
-      'https://api.paymongo.com/v1/payment_intents',
-      {
-        data: {
-          attributes: {
-            amount: amount,
-            payment_method_allowed: ['card'],
-            payment_method_options: {
-              card: {
-                request_three_d_secure: 'automatic'
-              }
-            },
-            currency: 'PHP',
-            capture_type: 'automatic'
-          }
-        }
-      },
-      PAYMONGO_HEADERS
-    );
-
-    const paymentIntentId = paymentIntentResponse.data.data.id;
-
-    // Step 3: Attach Payment Method to Intent
-    await axios.post(
-      `https://api.paymongo.com/v1/payment_intents/${paymentIntentId}/attach`,
-      {
-        data: {
-          attributes: {
-            payment_method: paymentMethodId
-          }
-        }
-      },
-      PAYMONGO_HEADERS
-    );
-
-    // Step 4: Save order details to PostgreSQL
-    await pool.query(
-      'INSERT INTO orders (customer_name, customer_email, address, city, province, postal, total_amount, payment_intent_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
-      [name, email, address, city, province, postal, total, paymentIntentId]
-    );
-
-    res.json({ message: 'Payment successful', paymentIntentId });
-  } catch (err) {
-    console.error('Error processing payment:', err.response?.data || err.message);
-    res.status(500).json({ error: err.response?.data || 'Internal Server Error' });
+  if (!valid) {
+    return res.status(400).send('Bad Request! Please provide all the necessary information');
   }
+
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+      authorization: 'Basic c2tfdGVzdF85cDhhYWE2ckM1M050cFVCWTdQUktXcHQ6'
+    },
+    body: JSON.stringify({
+      data: {
+        attributes: {
+          send_email_receipt: false,
+          show_description: true,
+          show_line_items: true,
+          line_items: line_items,
+          payment_method_types: ['gcash'],
+          description: 'WingsNThings Payment Details'
+        }
+      }
+    })
+  };
+
+  fetch('https://api.paymongo.com/v1/checkout_sessions', options)
+    .then(response => response.json())
+    .then(response => {
+      pool.query(`INSERT INTO payment_sessions (paymongo_id, cart_id) VALUES ('${response.data.id}', ${req.body.id}) ON CONFLICT DO NOTHING`).then(result => {
+        res.status(200).send(response.data.attributes.checkout_url);
+      });
+    }).catch(err => res.status(400).send('Paymongo request failed!'));
+});
+
+app.post('/api/payment/successful', (req, res) => {
+  console.log(req.body);
+  const id = req.body.data.attributes.data.id;
+  pool.query(`UPDATE payment_sessions SET paid = true WHERE paymongo_id = '${id}'`).then(result => {
+    console.log('Payment successful!');
+    res.status(200).send('Payment successful!');
+  });
 });
 
 // --- Root Route ---
