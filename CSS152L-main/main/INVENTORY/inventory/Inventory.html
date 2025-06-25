@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management</title>
+  <style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  body {
+    background-color: #D4A6A6;
+    margin: 0;
+    padding: 40px;
+    display: flex;
+    gap: 0;
+  }
+
+  .sidebar {
+    background-color: #2D2D2D;
+    width: 200px;
+    min-height: calc(100vh - 80px);
+    border-radius: 8px 0 0 8px;
+    padding: 20px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo img {
+    height: 160px;
+    width: auto;  
+    display: block;
+    margin: 0 auto;
+  }
+
+  .menu-item {
+    padding: 12px 16px;
+    margin: 4px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .menu-item.active {
+    background-color: #FFA500;
+    color: #2D2D2D;
+  }
+
+  .menu-item:not(.active):hover {
+    background-color: #404040;
+  }
+
+  .container {
+    background-color: white;
+    flex: 1;
+    border-radius: 0 8px 8px 0;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-height: calc(100vh - 80px);
+  }
+
+  .header {
+    padding: 20px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .search-bar {
+    background-color: #F4DEDE;
+    width: 400px;
+    border-radius: 20px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-bar input {
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    margin-left: 10px;
+  }
+
+  .content {
+    padding: 20px;
+    background-color: #ffffff;
+    min-height: 450px;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .delete-btn, .export-btn {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    margin-right: 10px;
+  }
+
+  .delete-btn {
+    color: #333;
+  }
+
+  .delete-btn i {
+    margin-right: 5px;
+  }
+
+  .delete-btn:hover, .export-btn:hover {
+    background-color: #e0e0e0;
+  }
+
+  .right-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .add-btn {
+    background-color: #E91E63;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+  }
+
+  .add-btn:hover {
+    background-color: #d81b60;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  th {
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 14px;
+    color: #888;
+    font-weight: normal;
+    border-bottom: 1px solid #ddd;
+    user-select: none;
+  }
+  
+  th[onclick] {
+    transition: background-color 0.2s;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+  }
+
+  .modal-form .form-group {
+    margin-bottom: 15px;
+  }
+
+  .modal-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+
+  .modal-form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn-cancel {
+    background-color: #eee;
+    color: #333;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .btn-add {
+    background-color: #4a4a4a;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .btn-cancel:hover {
+    background-color: #ddd;
+  }
+
+  .btn-add:hover {
+    background-color: #333;
+  }
+
+  td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  tr:hover {
+    background-color: #f6f6f6;
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #ccc;
+  }
+
+  .checkbox.checked {
+    background-color: #333;
+    color: white;
+  }
+
+  th i {
+    margin-left: 5px;
+  }
+
+  tr.selected {
+    background-color: #FFF0F0;
+  }
+
+  .checkbox.checked:after {
+    content: "✓";
+    color: white;
+    font-size: 14px;
+  }
+
+  .edit-btn {
+    background: none;
+    font-size: 8rem;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 3px;
+  }
+
+  .edit-btn:hover {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+
+  /* Delete Modal Styles */
+  #deleteConfirmModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .delete-modal-content {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    width: 350px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  #deleteConfirmModal h3 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .delete-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 25px;
+  }
+
+  .cancel-btn {
+    background: #f0f0f0;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    color: #555;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .confirm-btn {
+    background: #555555;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .cancel-btn:hover {
+    background: #e0e0e0;
+  }
+
+  .confirm-btn:hover {
+    background: #444444;
+  }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">
+      <img src="/main/images/logo.png" alt="Buffalo's Logo" >
+    </div>
+    <a href="Dashboard.html" style="text-decoration: none; color: inherit;">
+      <div class="menu-item">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+        </svg>
+        DASHBOARD
+      </div>
+    </a>
+    <div class="menu-item active">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M7 4V2C7 1.45 7.45 1 8 1h8c.55 0 1 .45 1 1v2h5v2h-2v13c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V6H2V4h5zM9 3v1h6V3H9zm-1 5v10h8V8H8z"/>
+      </svg>
+      INVENTORY
+    </div>
+  </div>
+  <div class="container">
+    <div class="header">
+      <h1>INVENTORY</h1>
+      <div class="search-bar">
+        <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" placeholder="Search...">
+      </div>
+    </div>
+    <div class="content">
+      <div class="actions">
+        <button class="delete-btn">
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Delete
+        </button>
+        <div class="right-actions">
+          <button class="export-btn">
+            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Export
+          </button>
+          <button class="add-btn" id="openAddModal">
+            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" style="color: white; margin-right: 5px;">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add item
+          </button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 5%">
+              <div class="checkbox" id="select-all"></div>
+            </th>
+            <th style="width: 30%; cursor: pointer;" onclick="sortTable(1, 'name')">NAME <span>▼</span></th>
+            <th style="width: 25%; cursor: pointer;" onclick="sortTable(2, 'quantity')">QUANTITY <span>▼</span></th>
+            <th style="width: 20%; cursor: pointer;" onclick="sortTable(3, 'price')">PRICE <span>▼</span></th>
+            <th style="width: 20%; cursor: pointer;" onclick="sortTable(4, 'date')">DATE <span>▼</span></th>
+            <th style="width: 10%;">ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="editItemModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Edit item</div>
+        <button class="modal-close" id="closeEditModal">×</button>
+      </div>
+      <form class="modal-form" id="editItemForm">
+        <div class="form-group">
+          <label for="editItemName">Name*</label>
+          <input type="text" id="editItemName" required>
+        </div>
+        <div class="form-group">
+          <label for="editItemQuantity">Quantity*</label>
+          <input type="number" id="editItemQuantity" required>
+        </div>
+        <div class="form-group">
+          <label for="editItemPrice">Price*</label>
+          <input type="number" id="editItemPrice" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="cancelEditItem">Cancel</button>
+          <button type="submit" class="btn-add">Add item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="addItemModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add new item</div>
+        <button class="modal-close" id="closeModal">×</button>
+      </div>
+      <form class="modal-form" id="addItemForm">
+        <div class="form-group">
+          <label for="itemName">Name*</label>
+          <input type="text" id="itemName" required>
+        </div>
+        <div class="form-group">
+          <label for="itemQuantity">Quantity*</label>
+          <input type="number" id="itemQuantity" required>
+        </div>
+        <div class="form-group">
+          <label for="itemPrice">Price*</label>
+          <input type="number" id="itemPrice" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="cancelAddItem">Cancel</button>
+          <button type="submit" class="btn-add">Add item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="deleteConfirmModal">
+    <div class="delete-modal-content">
+      <h3>Delete item</h3>
+      <div class="delete-modal-actions">
+        <button id="cancelDelete" class="cancel-btn">Cancel</button>
+        <button id="confirmDelete" class="confirm-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let sortState = {
+      name: { direction: 'asc', active: false },
+      quantity: { direction: 'asc', active: false },
+      price: { direction: 'asc', active: false },
+      date: { direction: 'asc', active: false }
+    };
+   
+    function toggleCheckbox(checkbox) {
+      checkbox.classList.toggle('checked');
+      const row = checkbox.closest('tr');
+      if (row) {
+        row.classList.toggle('selected');
+      }
+    }
+
+    function addCheckboxListeners() {
+      document.querySelectorAll('.checkbox').forEach(checkbox => {
+        const newCheckbox = checkbox.cloneNode(true);
+        checkbox.parentNode.replaceChild(newCheckbox, checkbox);
+      });
+
+      document.querySelectorAll('.checkbox').forEach(checkbox => {
+        checkbox.addEventListener('click', function() {
+          if (this.id === 'select-all') {
+            const isChecked = this.classList.contains('checked');
+            document.querySelectorAll('tbody .checkbox').forEach(cb => {
+              if (isChecked) {
+                cb.classList.remove('checked');
+                cb.closest('tr').classList.remove('selected');
+              } else {
+                cb.classList.add('checked');
+                cb.closest('tr').classList.add('selected');
+              }
+            });
+            toggleCheckbox(this);
+          } else {
+            toggleCheckbox(this);
+           
+            const totalCheckboxes = document.querySelectorAll('tbody .checkbox').length;
+            const checkedCheckboxes = document.querySelectorAll('tbody .checkbox.checked').length;
+            const selectAllCheckbox = document.getElementById('select-all');
+           
+            if (checkedCheckboxes === totalCheckboxes) {
+              selectAllCheckbox.classList.add('checked');
+            } else {
+              selectAllCheckbox.classList.remove('checked');
+            }
+          }
+        });
+      });
+    }
+   
+    addCheckboxListeners();
+   
+    function sortTable(columnIndex, columnName) {
+      const table = document.querySelector('table');
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+     
+      document.querySelectorAll('th span').forEach(span => {
+        span.textContent = '▼';
+      });
+     
+      sortState[columnName].direction = sortState[columnName].active ?
+        (sortState[columnName].direction === 'asc' ? 'desc' : 'asc') : 'asc';
+     
+      Object.keys(sortState).forEach(key => {
+        sortState[key].active = (key === columnName);
+      });
+     
+      const headerSpan = document.querySelectorAll('th span')[columnIndex - 1];
+      headerSpan.textContent = sortState[columnName].direction === 'asc' ? '▲' : '▼';
+     
+      rows.sort((a, b) => {
+        let aValue = a.cells[columnIndex].textContent.trim();
+        let bValue = b.cells[columnIndex].textContent.trim();
+       
+        if (columnName === 'quantity' || columnName === 'price') {
+          aValue = parseFloat(aValue);
+          bValue = parseFloat(bValue);
+          return sortState[columnName].direction === 'asc' ? aValue - bValue : bValue - aValue;
+        }
+        else if (columnName === 'date') {
+          const aDate = new Date(aValue);
+          const bDate = new Date(bValue);
+          return sortState[columnName].direction === 'asc' ? aDate - bDate : bDate - aDate;
+        }
+        else {
+          return sortState[columnName].direction === 'asc' ?
+            aValue.localeCompare(bValue) :
+            bValue.localeCompare(aValue);
+        }
+      });
+     
+      rows.forEach(row => tbody.removeChild(row));
+      rows.forEach(row => tbody.appendChild(row));
+    }
+   
+    const addItemModal = document.getElementById('addItemModal');
+    const editItemModal = document.getElementById('editItemModal');
+    const deleteModal = document.getElementById('deleteConfirmModal');
+    const openAddModalBtn = document.getElementById('openAddModal');
+    const closeModalBtn = document.getElementById('closeModal');
+    const closeEditModalBtn = document.getElementById('closeEditModal');
+    const cancelAddItemBtn = document.getElementById('cancelAddItem');
+    const cancelEditItemBtn = document.getElementById('cancelEditItem');
+    const addItemForm = document.getElementById('addItemForm');
+    const editItemForm = document.getElementById('editItemForm');
+    const deleteBtn = document.querySelector('.delete-btn');
+    const cancelDelete = document.getElementById('cancelDelete');
+    const confirmDelete = document.getElementById('confirmDelete');
+
+    let currentEditRow = null;
+
+    // Load inventory items when page loads
+    async function loadInventoryItems() {
+      try {
+        const response = await fetch('/api/inventory');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const items = await response.json();
+        
+        const tableBody = document.getElementById('inventoryTableBody');
+        tableBody.innerHTML = ''; // Clear existing items
+        
+        items.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>
+              <div class="checkbox"></div>
+            </td>
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>${item.price}</td>
+            <td>${new Date(item.date_added).toLocaleDateString()}</td>
+            <td>
+              <button class="edit-btn" onclick="openEditModal(this)" data-id="${item.id}">⋮</button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+        
+        addCheckboxListeners();
+      } catch (error) {
+        console.error('Error loading inventory:', error);
+        alert('Error loading inventory items. Please make sure the server is running.');
+      }
+    }
+
+    // Add new item
+    addItemForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+     
+      const name = document.getElementById('itemName').value;
+      const quantity = document.getElementById('itemQuantity').value;
+      const price = document.getElementById('itemPrice').value;
+     
+      try {
+        const response = await fetch('/api/inventory', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, quantity, price })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to add item');
+        }
+
+        await loadInventoryItems(); // Reload the inventory
+        closeModal();
+      } catch (error) {
+        console.error('Error adding item:', error);
+        alert('Error adding item: ' + error.message);
+      }
+    });
+
+    // Edit item
+    editItemForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+     
+      if (!currentEditRow) return;
+     
+      const id = currentEditRow.querySelector('.edit-btn').dataset.id;
+      const name = document.getElementById('editItemName').value;
+      const quantity = document.getElementById('editItemQuantity').value;
+      const price = document.getElementById('editItemPrice').value;
+     
+      try {
+        const response = await fetch(`/api/inventory/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, quantity, price })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to update item');
+        }
+
+        await loadInventoryItems(); // Reload the inventory
+        closeEditModal();
+      } catch (error) {
+        console.error('Error updating item:', error);
+        alert('Error updating item: ' + error.message);
+      }
+    });
+
+    // Delete items
+    confirmDelete.addEventListener('click', async () => {
+      const selectedRows = document.querySelectorAll('tbody tr.selected');
+      if (selectedRows.length === 0) {
+        alert('Please select items to delete');
+        return;
+      }
+
+      const deletePromises = Array.from(selectedRows).map(async (row) => {
+        const id = row.querySelector('.edit-btn').dataset.id;
+        try {
+          const response = await fetch(`/api/inventory/${id}`, {
+            method: 'DELETE'
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to delete item');
+          }
+        } catch (error) {
+          console.error('Error deleting item:', error);
+          throw error;
+        }
+      });
+
+      try {
+        await Promise.all(deletePromises);
+        await loadInventoryItems(); // Reload the inventory
+        document.getElementById('select-all')?.classList.remove('checked');
+        deleteModal.style.display = 'none';
+      } catch (error) {
+        alert('Error deleting items: ' + error.message);
+      }
+    });
+
+    // Load inventory items when page loads
+    loadInventoryItems();
+
+    openAddModalBtn.addEventListener('click', () => {
+      addItemModal.style.display = 'flex';
+    });
+   
+    function closeModal() {
+      addItemModal.style.display = 'none';
+      addItemForm.reset();
+    }
+   
+    function closeEditModal() {
+      editItemModal.style.display = 'none';
+      editItemForm.reset();
+      currentEditRow = null;
+    }
+   
+    closeModalBtn.addEventListener('click', closeModal);
+    closeEditModalBtn.addEventListener('click', closeEditModal);
+    cancelAddItemBtn.addEventListener('click', closeModal);
+    cancelEditItemBtn.addEventListener('click', closeEditModal);
+   
+    addItemModal.addEventListener('click', (e) => {
+      if (e.target === addItemModal) {
+        closeModal();
+      }
+    });
+   
+    editItemModal.addEventListener('click', (e) => {
+      if (e.target === editItemModal) {
+        closeEditModal();
+      }
+    });
+   
+    deleteModal.addEventListener('click', (e) => {
+      if (e.target === deleteModal) {
+        deleteModal.style.display = 'none';
+      }
+    });
+
+    function openEditModal(editBtn) {
+      const row = editBtn.closest('tr');
+      currentEditRow = row;
+     
+      const cells = row.cells;
+      const name = cells[1].textContent;
+      const quantity = cells[2].textContent;
+      const price = cells[3].textContent;
+     
+      document.getElementById('editItemName').value = name;
+      document.getElementById('editItemQuantity').value = quantity;
+      document.getElementById('editItemPrice').value = price;
+     
+      editItemModal.style.display = 'flex';
+    }
+
+    const searchInput = document.querySelector('.search-bar input');
+    searchInput.addEventListener('input', performSearch);
+
+    function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      const tableRows = document.querySelectorAll('#inventoryTableBody tr');
+     
+      tableRows.forEach(row => {
+        const cells = Array.from(row.cells).slice(1);
+        let rowContainsSearchTerm = false;
+       
+        cells.forEach(cell => {
+          const cellText = cell.textContent.toLowerCase();
+          if (cellText.includes(searchTerm)) {
+            rowContainsSearchTerm = true;
+          }
+        });
+       
+        if (rowContainsSearchTerm || searchTerm === '') {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+     
+      updateSelectAllCheckbox();
+    }
+
+    function updateSelectAllCheckbox() {
+      const visibleCheckboxes = Array.from(document.querySelectorAll('tbody tr:not([style*="display: none"]) .checkbox'));
+      const checkedVisibleCheckboxes = visibleCheckboxes.filter(cb => cb.classList.contains('checked'));
+      const selectAllCheckbox = document.getElementById('select-all');
+     
+      if (visibleCheckboxes.length > 0 && visibleCheckboxes.length === checkedVisibleCheckboxes.length) {
+        selectAllCheckbox.classList.add('checked');
+      } else {
+        selectAllCheckbox.classList.remove('checked');
+      }
+    }
+
+    function modifyCheckboxLogic() {
+      const selectAllCheckbox = document.getElementById('select-all');
+     
+      selectAllCheckbox.addEventListener('click', function() {
+        const isChecked = this.classList.contains('checked');
+        document.querySelectorAll('tbody tr:not([style*="display: none"]) .checkbox').forEach(cb => {
+          if (isChecked) {
+            cb.classList.remove('checked');
+            cb.closest('tr').classList.remove('selected');
+          } else {
+            cb.classList.add('checked');
+            cb.closest('tr').classList.add('selected');
+          }
+        });
+        toggleCheckbox(this);
+      });
+    }
+
+    modifyCheckboxLogic();
+  </script>
+</body>
+</html>

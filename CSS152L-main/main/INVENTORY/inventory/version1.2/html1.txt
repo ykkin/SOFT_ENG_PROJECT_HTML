@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management</title>
+  <style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  body {
+    background-color: #EAE0E0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container {
+    background-color: white;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .header {
+    padding: 20px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .search-bar {
+    background-color: #F4DEDE;
+    width: 400px;
+    border-radius: 20px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-bar input {
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    margin-left: 10px;
+  }
+
+  .content {
+    padding: 20px;
+    background-color: #ffffff;
+    min-height: 450px;
+  }
+
+
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .delete-btn, .export-btn {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    margin-right: 10px;
+  }
+
+  .delete-btn {
+    color: #333;
+  }
+
+  .delete-btn i {
+    margin-right: 5px;
+  }
+
+  .delete-btn:hover, .export-btn:hover {
+    background-color: #e0e0e0;
+  }
+
+  .right-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .add-btn {
+    background-color: #E91E63;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+  }
+
+  .add-btn:hover {
+    background-color: #d81b60;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  th {
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 14px;
+    color: #888;
+    font-weight: normal;
+    border-bottom: 1px solid #ddd;
+    user-select: none;
+  }
+  
+  th[onclick] {
+    transition: background-color 0.2s;
+  }
+  
+  /* Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+  }
+
+  .modal-form .form-group {
+    margin-bottom: 15px;
+  }
+
+  .modal-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+
+  .modal-form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn-cancel {
+    background-color: #eee;
+    color: #333;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .btn-add {
+    background-color: #4a4a4a;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .btn-cancel:hover {
+    background-color: #ddd;
+  }
+
+  .btn-add:hover {
+    background-color: #333;
+  }
+
+  td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  tr:hover {
+    background-color: #f6f6f6;
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #ccc;
+  }
+
+  .checkbox.checked {
+    background-color: #333;
+    color: white;
+  }
+
+  th i {
+    margin-left: 5px;
+  }
+
+  tr.selected {
+    background-color: #FFF0F0;
+  }
+
+  .checkbox.checked:after {
+    content: "✓";
+    color: white;
+    font-size: 14px;
+  }
+
+  /* Delete Modal Styles */
+  #deleteConfirmModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .delete-modal-content {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    width: 350px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  #deleteConfirmModal h3 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .delete-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 25px;
+  }
+
+  .cancel-btn {
+    background: #f0f0f0;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    color: #555;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .confirm-btn {
+    background: #555555;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .cancel-btn:hover {
+    background: #e0e0e0;
+  }
+
+  .confirm-btn:hover {
+    background: #444444;
+  }
+  </style>
+</head>
+<body>
+    <div class="container">
+      <div class="header">
+        <h1>INVENTORY</h1>
+        <div class="search-bar">
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" placeholder="Search...">
+        </div>
+      </div>
+      <div class="content">
+        <div class="actions">
+          <button class="delete-btn">
+            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Delete
+          </button>
+          <div class="right-actions">
+            <button class="export-btn">
+              <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Export
+            </button>
+            <button class="add-btn" id="openAddModal">
+              <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" style="color: white; margin-right: 5px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add item
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 5%">
+                <div class="checkbox" id="select-all"></div>
+              </th>
+              <th style="width: 30%; cursor: pointer;" onclick="sortTable(1, 'name')">NAME <span>▼</span></th>
+              <th style="width: 20%; cursor: pointer;" onclick="sortTable(2, 'quantity')">QUANTITY <span>▼</span></th>
+              <th style="width: 20%; cursor: pointer;" onclick="sortTable(3, 'price')">PRICE <span>▼</span></th>
+              <th style="width: 25%; cursor: pointer;" onclick="sortTable(4, 'date')">DATE <span>▼</span></th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTableBody">
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 1</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 2</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 3</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 4</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 5</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 6</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 7</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 8</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 9</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- Add Item Modal -->
+    <div class="modal-overlay" id="addItemModal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Add new item</div>
+          <button class="modal-close" id="closeModal">×</button>
+        </div>
+        <form class="modal-form" id="addItemForm">
+          <div class="form-group">
+            <label for="itemName">Name*</label>
+            <input type="text" id="itemName" required>
+          </div>
+          <div class="form-group">
+            <label for="itemQuantity">Quantity*</label>
+            <input type="number" id="itemQuantity" required>
+          </div>
+          <div class="form-group">
+            <label for="itemPrice">Price*</label>
+            <input type="number" id="itemPrice" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" id="cancelAddItem">Cancel</button>
+            <button type="submit" class="btn-add">Add item</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal">
+      <div class="delete-modal-content">
+        <h3>Delete item</h3>
+        <div class="delete-modal-actions">
+          <button id="cancelDelete" class="cancel-btn">Cancel</button>
+          <button id="confirmDelete" class="confirm-btn">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Data structure to maintain sorting state
+      let sortState = {
+        name: { direction: 'asc', active: false },
+        quantity: { direction: 'asc', active: false },
+        price: { direction: 'asc', active: false },
+        date: { direction: 'asc', active: false }
+      };
+      
+      // Function to toggle checkbox state
+      function toggleCheckbox(checkbox) {
+        checkbox.classList.toggle('checked');
+        const row = checkbox.closest('tr');
+        if (row) {
+          row.classList.toggle('selected');
+        }
+      }
+  
+      // Add click event listeners to checkboxes
+      function addCheckboxListeners() {
+        // Remove existing listeners first to prevent duplicates
+        document.querySelectorAll('.checkbox').forEach(checkbox => {
+          const newCheckbox = checkbox.cloneNode(true);
+          checkbox.parentNode.replaceChild(newCheckbox, checkbox);
+        });
+
+        // Add new listeners
+        document.querySelectorAll('.checkbox').forEach(checkbox => {
+          checkbox.addEventListener('click', function() {
+            if (this.id === 'select-all') {
+              const isChecked = this.classList.contains('checked');
+              document.querySelectorAll('tbody .checkbox').forEach(cb => {
+                if (isChecked) {
+                  cb.classList.remove('checked');
+                  cb.closest('tr').classList.remove('selected');
+                } else {
+                  cb.classList.add('checked');
+                  cb.closest('tr').classList.add('selected');
+                }
+              });
+              toggleCheckbox(this);
+            } else {
+              toggleCheckbox(this);
+              
+              // Update select-all checkbox based on individual checkboxes
+              const totalCheckboxes = document.querySelectorAll('tbody .checkbox').length;
+              const checkedCheckboxes = document.querySelectorAll('tbody .checkbox.checked').length;
+              const selectAllCheckbox = document.getElementById('select-all');
+              
+              if (checkedCheckboxes === totalCheckboxes) {
+                selectAllCheckbox.classList.add('checked');
+              } else {
+                selectAllCheckbox.classList.remove('checked');
+              }
+            }
+          });
+        });
+      }
+      
+      // Initialize checkbox listeners
+      addCheckboxListeners();
+      
+      // Function to sort table
+      function sortTable(columnIndex, columnName) {
+        const table = document.querySelector('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Reset all column headers
+        document.querySelectorAll('th span').forEach(span => {
+          span.textContent = '▼';
+        });
+        
+        // Toggle sort direction for the clicked column
+        sortState[columnName].direction = sortState[columnName].active ? 
+          (sortState[columnName].direction === 'asc' ? 'desc' : 'asc') : 'asc';
+        
+        // Mark this column as active
+        Object.keys(sortState).forEach(key => {
+          sortState[key].active = (key === columnName);
+        });
+        
+        // Update the sort indicator
+        const headerSpan = document.querySelectorAll('th span')[columnIndex - 1];
+        headerSpan.textContent = sortState[columnName].direction === 'asc' ? '▲' : '▼';
+        
+        // Sort the rows
+        rows.sort((a, b) => {
+          let aValue = a.cells[columnIndex].textContent.trim();
+          let bValue = b.cells[columnIndex].textContent.trim();
+          
+          // For numeric columns (quantity and price)
+          if (columnName === 'quantity' || columnName === 'price') {
+            aValue = parseFloat(aValue);
+            bValue = parseFloat(bValue);
+            return sortState[columnName].direction === 'asc' ? aValue - bValue : bValue - aValue;
+          }
+          // For date column
+          else if (columnName === 'date') {
+            const aDate = new Date(aValue);
+            const bDate = new Date(bValue);
+            return sortState[columnName].direction === 'asc' ? aDate - bDate : bDate - aDate;
+          }
+          // For text column (name)
+          else {
+            return sortState[columnName].direction === 'asc' ? 
+              aValue.localeCompare(bValue) : 
+              bValue.localeCompare(aValue);
+          }
+        });
+        
+        // Remove all existing rows
+        rows.forEach(row => tbody.removeChild(row));
+        
+        // Add sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+      }
+      
+      // Modal functionality
+      const addItemModal = document.getElementById('addItemModal');
+      const deleteModal = document.getElementById('deleteConfirmModal');
+      const openAddModalBtn = document.getElementById('openAddModal');
+      const closeModalBtn = document.getElementById('closeModal');
+      const cancelAddItemBtn = document.getElementById('cancelAddItem');
+      const addItemForm = document.getElementById('addItemForm');
+      const deleteBtn = document.querySelector('.delete-btn');
+      const cancelDelete = document.getElementById('cancelDelete');
+      const confirmDelete = document.getElementById('confirmDelete');
+
+      // Delete functionality
+      deleteBtn.addEventListener('click', () => {
+        const selectedRows = document.querySelectorAll('tbody tr.selected');
+        if (selectedRows.length === 0) {
+          alert('Please select items to delete');
+          return;
+        }
+        deleteModal.style.display = 'flex';
+      });
+
+      cancelDelete.addEventListener('click', () => {
+        deleteModal.style.display = 'none';
+      });
+
+      confirmDelete.addEventListener('click', () => {
+        document.querySelectorAll('tbody tr.selected').forEach(row => row.remove());
+        document.getElementById('select-all')?.classList.remove('checked');
+        deleteModal.style.display = 'none';
+      });
+
+      // Open modal
+      openAddModalBtn.addEventListener('click', () => {
+        addItemModal.style.display = 'flex';
+      });
+      
+      // Close modal functions
+      function closeModal() {
+        addItemModal.style.display = 'none';
+        addItemForm.reset();
+      }
+      
+      closeModalBtn.addEventListener('click', closeModal);
+      cancelAddItemBtn.addEventListener('click', closeModal);
+      
+      // Close modal if clicked outside
+      addItemModal.addEventListener('click', (e) => {
+        if (e.target === addItemModal) {
+          closeModal();
+        }
+      });
+      
+      // Close delete modal if clicked outside
+      deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal) {
+          deleteModal.style.display = 'none';
+        }
+      });
+
+      // Add new item
+      addItemForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Get form values
+        const name = document.getElementById('itemName').value;
+        const quantity = document.getElementById('itemQuantity').value;
+        const price = document.getElementById('itemPrice').value;
+        
+        // Get current date
+        const today = new Date();
+        const dateStr = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+        
+        // Create new table row
+        const tableBody = document.getElementById('inventoryTableBody');
+        const newRow = document.createElement('tr');
+        
+        newRow.innerHTML = `
+          <td>
+            <div class="checkbox"></div>
+          </td>
+          <td>${name}</td>
+          <td>${quantity}</td>
+          <td>${price}</td>
+          <td>${dateStr}</td>
+        `;
+        
+        // Add the new row to the table
+        tableBody.appendChild(newRow);
+        
+        // Reinitialize checkbox listeners
+        addCheckboxListeners();
+        
+        // Close the modal
+        closeModal();
+      });
+
+      // Get reference to the search input
+      const searchInput = document.querySelector('.search-bar input');
+
+      // Add event listener for input changes
+      searchInput.addEventListener('input', performSearch);
+
+      // Function to perform search on the table
+      function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const tableRows = document.querySelectorAll('#inventoryTableBody tr');
+        
+        // Loop through all table rows
+        tableRows.forEach(row => {
+          // Get all cells excluding the checkbox cell
+          const cells = Array.from(row.cells).slice(1); // Skip checkbox cell
+          let rowContainsSearchTerm = false;
+          
+          // Check if any cell contains the search term
+          cells.forEach(cell => {
+            const cellText = cell.textContent.toLowerCase();
+            if (cellText.includes(searchTerm)) {
+              rowContainsSearchTerm = true;
+            }
+          });
+          
+          // Show or hide the row based on search result
+          if (rowContainsSearchTerm || searchTerm === '') {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+        
+        // Update select-all checkbox based on visible rows
+        updateSelectAllCheckbox();
+      }
+
+      // Function to update select-all checkbox based on visible rows
+      function updateSelectAllCheckbox() {
+        const visibleCheckboxes = Array.from(document.querySelectorAll('tbody tr:not([style*="display: none"]) .checkbox'));
+        const checkedVisibleCheckboxes = visibleCheckboxes.filter(cb => cb.classList.contains('checked'));
+        const selectAllCheckbox = document.getElementById('select-all');
+        
+        if (visibleCheckboxes.length > 0 && visibleCheckboxes.length === checkedVisibleCheckboxes.length) {
+          selectAllCheckbox.classList.add('checked');
+        } else {
+          selectAllCheckbox.classList.remove('checked');
+        }
+      }
+
+      // Modify the existing checkbox logic to work with the search functionality
+      function modifyCheckboxLogic() {
+        // Get the original select-all logic
+        const selectAllCheckbox = document.getElementById('select-all');
+        
+        // Replace the existing event listener for select-all
+        selectAllCheckbox.addEventListener('click', function() {
+          const isChecked = this.classList.contains('checked');
+          // Only affect visible rows
+          document.querySelectorAll('tbody tr:not([style*="display: none"]) .checkbox').forEach(cb => {
+            if (isChecked) {
+              cb.classList.remove('checked');
+              cb.closest('tr').classList.remove('selected');
+            } else {
+              cb.classList.add('checked');
+              cb.closest('tr').classList.add('selected');
+            }
+          });
+          toggleCheckbox(this);
+        });
+      }
+
+      // Call this function to modify the checkbox logic after the page loads
+      modifyCheckboxLogic();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: 'Merriweather', serif;
+        }
+        .header {
+            width: 100%;
+            height: 84px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.90);
+        }
+        .main-content {
+            padding-top: 84px; 
+        }
+        .card-container {
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        .card-container:hover {
+            transform: scale(1.02);
+        }
+        .card-image {
+            border-radius: 25px;
+            transition: filter 0.3s ease;
+        }
+        .card-container:hover .card-image {
+            filter: blur(1.2px);
+        }
+        .card-label {
+            width: 180px;
+            height: 50px;
+            position: absolute;
+            background: rgba(255, 255, 255, 0.90);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card-container:hover .card-label {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .label-text {
+            text-align: center;
+            color: black;
+            font-size: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            line-height: 20px;
+            transition: all 0.3s ease;
+        }
+        .card-container:hover .label-text {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        .best-seller {
+            width: 100%;
+            height: 461px;
+            background: #FF6060;
+            position: relative;
+            margin-top: 40px;
+            overflow: hidden;
+        }
+        .carousel-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .carousel-item {
+            position: absolute;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateX(-50%) scale(0.8);
+        }
+        .carousel-item img {
+            border-radius: 15px;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .carousel-item .item-label {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: black;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .carousel-item .item-label .title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            line-height: 16px;
+            margin-bottom: 4px;
+        }
+        .carousel-item .item-label .subtitle {
+            font-family: 'Merriweather', serif;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 16px;
+            margin-bottom: 4px;
+        }
+        .carousel-item.active {
+            z-index: 2;
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+        .carousel-item.active img {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .carousel-item.active .item-label {
+            opacity: 1;
+            bottom: -60px;
+        }
+        .carousel-item:not(.active) {
+            filter: blur(2px);
+            opacity: 0.7;
+        }
+        .carousel-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 3;
+        }
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .carousel-dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* About section elements - initially hidden */
+        .about-element {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .about-element.left {
+            transform: translateX(-30px);
+        }
+
+        .about-element.right {
+            transform: translateX(30px);
+        }
+
+        .about-element.animate {
+            opacity: 1;
+            transform: translateY(0) translateX(0);
+        }
+
+        .about-element.animate.delay-1 {
+            transition-delay: 0.2s;
+        }
+
+        .about-element.animate.delay-2 {
+            transition-delay: 0.4s;
+        }
+
+        .about-element.animate.delay-3 {
+            transition-delay: 0.6s;
+        }
+
+        .about-element.animate.delay-4 {
+            transition-delay: 0.8s;
+        }
+
+        .about-element.animate.delay-5 {
+            transition-delay: 1s;
+        }
+    </style>
+</head>
+<body>
+    
+    <div style="width: 100%; min-height: 100vh; position: relative; background: #F8ECEC; overflow-x: hidden;">
+    
+    <!-- HEADER (Toolbar) -->
+    <div class="header">
+        <!-- hamburger -->
+        <div style="width: 40px; height: 40px; position: absolute; top: 22px; left: 41px; overflow: hidden;">
+        <div style="width: 30px; height: 20px; position: absolute; top: 10px; left: 5px; outline: 4px #1E1E1E solid; outline-offset: -2px;"></div>
+        </div>
+        
+        <!-- search bar -->
+        <div style="width: 543px; padding: 12px 16px; position: absolute; top: 22px; left: 688px; background: white; border-radius: 9999px; outline: 1px #D9D9D9 solid; display: flex; align-items: center; gap: 8px;">
+        <div style="flex: 1 1 0;"></div>
+        <div style="width: 16px; height: 16px; position: relative;"></div>
+        </div>
+
+        <!-- cart icon -->
+        <div style="width: 40px; height: 40px; position: absolute; top: 22px; left: 1838px; overflow: hidden;">
+        <div style="width: 36.67px; height: 35px; position: absolute; top: 1.67px; left: 1.67px; outline: 4px #1E1E1E solid; outline-offset: -2px;"></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- MAIN IMAGE SECTION -->
+        <div style="position: relative;">
+            <img src="../images/main page/d979b37c-cd0f-416f-8d05-1f83ab54e1dd.jpg"
+                style="width: 100%; height: 540px; object-fit: cover; position: relative; z-index: 1;" />
+            <div style="position: absolute; top: 65%; left: 50%; transform: translate(-50%, -50%); z-index: 2; text-align: center;">
+                <h1 style="font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 20px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin: 0; letter-spacing: 2px;">
+                    WHERE FLAVOR MEETS FIRE
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards Section -->
+    <div style="position: relative; height: 600px; margin-top: 40px;">
+        <div class="card-container" style="position: absolute; left: 262px; top: 0;">
+            <img class="card-image" style="width: 350px; height: 428px;" src="../images/main page/117944378_10158540755414547_1326503116057793675_n.jpg" />
+            <div class="card-label" style="left: 65px; top: 368px; height: 35px;">
+                <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;">WHAT'S NEW</div>
+            </div>
+        </div>
+
+        <div class="card-container" style="position: absolute; left: 626px; top: 0;">
+            <img class="card-image" style="width: 342px; height: 195px;" src="../images/main page/7235285.JPG" />
+            <div class="card-label" style="left: 81px; top: 145px; height: 35px;">
+                <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;">MENU</div>
+            </div>
+        </div>
+
+        <div class="card-container" style="position: absolute; left: 982px; top: 0;">
+            <img class="card-image" style="width: 304px; height: 426px;" src="../images/main page/485141724_10162314528994547_3645822391865856742_n.jpg" />
+            <div class="card-label" style="left: 62px; top: 368px; height: 35px;">
+                <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;"">WINGS</div>
+            </div>
+        </div>
+
+        <div class="card-container" style="position: absolute; left: 1300px; top: 0;">
+            <img class="card-image" style="width: 304px; height: 426px;" src="../images/main page/485800460_10162319934894547_8630561960821771825_n.jpg" />
+            <div class="card-label" style="left: 62px; top: 368px; height: 35px;">
+                <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;"">THINGS</div>
+            </div>
+        </div>
+
+        <div class="card-container" style="position: absolute; left: 626px; top: 224px;">
+            <img class="card-image" style="width: 342px; height: 204px;" src="../images/main page/1485141724_10162314528994547_3645822391865856742_n.jpg" />
+            <div class="card-label" style="left: 81px; top: 144px; height: 35px;">
+                <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;"">BULK ORDER</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEST SELLER -->
+    <div class="best-seller" style="position: relative; top: 0; margin-top: 20px;">
+        <div style="position: absolute; left: 200px; top: 50%; transform: translateY(-50%); z-index: 3;">
+            <div style="font-family: 'Montserrat', sans-serif; font-size: 80px; color: white; line-height: 1;">
+                <span style="font-weight: 400;">BEST</span><br/>
+                <span style="font-weight: 700;">SELLER</span>
+            </div>
+        </div>
+        <div class="carousel-container">
+            <div class="carousel-item active" style="left: 50%; transform: translateX(-50%);">
+                <img style="width: 444px; height: 275px;" src="../images/main page/485141724_10162314528994547_3645822391865856742_n.jpg" />
+                <div class="item-label">
+                    <div class="title">GO SOLO</div>
+                    <div class="subtitle">ORIGINAL CHICKEN FINGERS</div>
+                </div>
+            </div>
+            <div class="carousel-item" style="left: 150%; transform: translateX(-50%);">
+                <img style="width: 444px; height: 275px;" src="../images/main page/1485141724_10162314528994547_3645822391865856742_n.jpg" />
+                <div class="item-label">
+                    <div class="title">MAKE IT DOUBLE</div>
+                    <div class="subtitle">ORIGINAL CHICKEN FINGERS</div>
+                </div>
+            </div>
+            <div class="carousel-item" style="left: -50%; transform: translateX(-50%);">
+                <img style="width: 444px; height: 275px;" src="../images/main page/117944378_10158540755414547_1326503116057793675_n.jpg" />
+                <div class="item-label">
+                    <div class="title">CHEESEBURGER</div>
+                    <div class="subtitle">NY STYLE</div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-nav">
+            <div class="carousel-dot active"></div>
+            <div class="carousel-dot"></div>
+            <div class="carousel-dot"></div>
+        </div>
+    </div>
+
+ 
+    <!-- ABOUT US -->
+    
+<!-- CAROUSEL-STYLE ABOUT US SECTION WITH NEWSPAPER BACKGROUND -->
+<section id="about-us-carousel" style="width: 100%; height: 100vh; background: url('../images/newspaper-bg.jpg') repeat; background-size: cover; background-attachment: fixed; position: relative; overflow: hidden; padding-top: 60px;">
+  <div style="position: absolute; top: 20px; width: 100%; text-align: center;">
+    <h2 style="font-size: 48px; font-family: 'Montserrat', sans-serif; color: #1a1a1a; text-shadow: 1px 1px 3px rgba(255,255,255,0.6);">About Us</h2>
+  </div>
+  <div class="carousel-container" style="width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+    <!-- Slide 1 -->
+    <div class="carousel-item about-slide active" style="left: 50%; transform: translateX(-50%); width: 80%; background: rgba(255,255,255,0.88); padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+      <div style="display: flex; align-items: center; gap: 40px;">
+        <img src="../images/main page/1485141724_10162314528994547_3645822391865856742_n.jpg" style="width: 400px; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);" />
+        <div>
+          <h3 style="font-size: 36px; font-weight: 700; color: #1a1a1a;">THIS IS WHO WE ARE</h3>
+          <p style="font-size: 18px; max-width: 600px; color: #333;">Buffalo’s Wings N’ Things isn’t just a restaurant. We’re the team that brings the heat, the heart, and the hustle — one saucy bite at a time. We opened our Assembly Grounds branch in 2019 with one goal: serve food that fires up your taste buds and brings people together.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="carousel-item about-slide" style="left: 150%; transform: translateX(-50%); width: 80%; background: rgba(255,255,255,0.88); padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+      <div style="display: flex; align-items: center; gap: 40px;">
+        <img src="../images/main page/117944378_10158540755414547_1326503116057793675_n.jpg" style="width: 400px; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);" />
+        <div>
+          <h3 style="font-size: 36px; font-weight: 700; color: #1a1a1a;">IT’S MORE THAN WINGS</h3>
+          <p style="font-size: 18px; max-width: 600px; color: #333;">From our signature Champion Buffalo wings to hearty rice meals and game-day favorites, everything we serve is bold, made fresh, and packed with flavor. We’re not just known for our wings — we’re known for our attitude.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="carousel-item about-slide" style="left: -50%; transform: translateX(-50%); width: 80%; background: rgba(255,255,255,0.88); padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+      <div style="display: flex; align-items: center; gap: 40px;">
+        <img src="../images/main page/485800460_10162319934894547_8630561960821771825_n.jpg" style="width: 400px; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);" />
+        <div>
+          <h3 style="font-size: 36px; font-weight: 700; color: #1a1a1a;">POWERED BY PASSION</h3>
+          <p style="font-size: 18px; max-width: 600px; color: #333;">Behind the scenes, we’re a tight-knit team with a shared love for great food and great service. We create a space where regulars feel at home, newcomers feel welcome, and every plate tells our story.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carousel Navigation Dots -->
+  <div class="carousel-nav about-dots" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 3;">
+    <div class="carousel-dot active"></div>
+    <div class="carousel-dot"></div>
+    <div class="carousel-dot"></div>
+  </div>
+</section>
+
+    <!-- FOOTER -->
+<footer style="background-color: #00809D; color: white; padding: 40px 20px;">
+  <div style="max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+
+    <!-- Logo -->
+    <div style="flex: 1; min-width: 150px; text-align: center;">
+      <img src="../images/logo.png" alt="B Logo" style="height: 80px;">
+    </div>
+
+    <!-- Socials / Contact Info -->
+    <div style="flex: 1; min-width: 250px; text-align: center;">
+      <h4 style="font-family: 'Montserrat', sans-serif; font-weight: 700;">GET IN TOUCH</h4>
+      <p style="margin: 10px 0;"><img src="../images/icons/email-icon.png" alt="email" style="height: 16px; vertical-align: middle; margin-right: 5px;"> johndoe@gmail.com</p>
+      <p><img src="../images/icons/phone-icon.png" alt="phone" style="height: 16px; vertical-align: middle; margin-right: 5px;"> 0912345678912</p>
+    </div>
+
+    <!-- Newsletter Signup -->
+    <div style="flex: 1; min-width: 280px; text-align: center;">
+      <h4 style="font-family: 'Montserrat', sans-serif; font-weight: 700;">NEWSLETTER SIGN-UP</h4>
+      <p style="font-size: 14px;">Subscribe to our newsletter to receive our offers</p>
+      <form id="footer-newsletter-form" style="margin-top: 10px; display: flex; justify-content: center;">
+        <input type="email" name="email" placeholder="Your email address" required
+               style="padding: 10px; border-radius: 9999px 0 0 9999px; border: none; outline: none; width: 200px;">
+        <button type="submit"
+                style="padding: 10px 20px; background: #FF6060; color: white; border: none; border-radius: 0 9999px 9999px 0; font-weight: 600; cursor: pointer;">
+          Subscribe
+        </button>
+      </form>
+      <p id="footer-newsletter-msg" style="margin-top: 10px; font-size: 13px;"></p>
+    </div>
+
+  </div>
+</footer>
+    <!-- CAROUSEL SCRIPT -->
+    <script>
+        const carousel = document.querySelector('.carousel-container');
+        const items = document.querySelectorAll('.carousel-item');
+        const dots = document.querySelectorAll('.carousel-dot');
+        let currentIndex = 0;
+        let isAnimating = false;
+
+        function updateCarousel() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            items.forEach((item, index) => {
+                item.classList.remove('active');
+                if (index === currentIndex) {
+                    item.style.left = '50%';
+                    setTimeout(() => item.classList.add('active'), 50);
+                } else if (index === (currentIndex + 1) % items.length) {
+                    item.style.left = '150%';
+                } else {
+                    item.style.left = '-50%';
+                }
+            });
+
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+
+            setTimeout(() => {
+                isAnimating = false;
+            }, 800); 
+        }
+
+        function nextSlide() {
+            if (isAnimating) return;
+            currentIndex = (currentIndex + 1) % items.length;
+            updateCarousel();
+        }
+
+        // Auto-advance slides every 3 seconds
+        setInterval(nextSlide, 3000);
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                if (isAnimating || currentIndex === index) return;
+                currentIndex = index;
+                updateCarousel();
+            });
+        });
+
+        updateCarousel();
+
+        const aboutSection = document.getElementById('about-section');
+        const aboutElements = document.querySelectorAll('.about-element');
+        let aboutAnimationTriggered = false;
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -20% 0px', // Trigger when 20% of section is visible
+            threshold: 0
+        };
+
+        const aboutObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !aboutAnimationTriggered) {
+                    aboutAnimationTriggered = true;
+                    
+                    // Add animate class to all about elements
+                    aboutElements.forEach(element => {
+                        element.classList.add('animate');
+                    });
+                }
+            });
+        }, observerOptions);
+
+        aboutObserver.observe(aboutSection);
+
+       
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                if (!aboutAnimationTriggered) {
+                    const aboutRect = aboutSection.getBoundingClientRect();
+                    const windowHeight = window.innerHeight;
+                    
+                  
+                    if (aboutRect.top < windowHeight * 0.8 && aboutRect.bottom > windowHeight * 0.2) {
+                        aboutAnimationTriggered = true;
+                        
+                        aboutElements.forEach(element => {
+                            element.classList.add('animate');
+                        });
+                    }
+                }
+            }, 10);
+        });
+    </script>
+
+<script>
+  const aboutItems = document.querySelectorAll('#about-us-carousel .about-slide');
+  const aboutDots = document.querySelectorAll('#about-us-carousel .carousel-dot');
+  let aboutIndex = 0;
+  let aboutAnimating = false;
+
+  function updateAboutCarousel() {
+    if (aboutAnimating) return;
+    aboutAnimating = true;
+
+    aboutItems.forEach((item, index) => {
+      item.classList.remove('active');
+      if (index === aboutIndex) {
+        item.style.top = '50%';
+        item.style.left = '50%';
+        item.style.transform = 'translate(-50%, -50%)';
+        setTimeout(() => item.classList.add('active'), 50);
+      } else if (index === (aboutIndex + 1) % aboutItems.length) {
+        item.style.top = '150%';
+        item.style.left = '50%';
+        item.style.transform = 'translate(-50%, -50%)';
+      } else {
+        item.style.top = '-50%';
+        item.style.left = '50%';
+        item.style.transform = 'translate(-50%, -50%)';
+      }
+    });
+
+    aboutDots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === aboutIndex);
+    });
+
+    setTimeout(() => {
+      aboutAnimating = false;
+    }, 800);
+  }
+
+  function nextAboutSlide() {
+    if (aboutAnimating) return;
+    aboutIndex = (aboutIndex + 1) % aboutItems.length;
+    updateAboutCarousel();
+  }
+
+  // Auto-scroll every 5 seconds
+  setInterval(nextAboutSlide, 5000);
+
+  aboutDots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      if (aboutAnimating || aboutIndex === index) return;
+      aboutIndex = index;
+      updateAboutCarousel();
+    });
+  });
+
+  // Set initial positions
+  aboutItems.forEach((item, index) => {
+    item.style.position = 'absolute';
+    item.style.transition = 'all 0.8s ease';
+    item.style.left = '50%';
+    if (index === 0) {
+      item.style.top = '50%';
+      item.style.transform = 'translate(-50%, -50%)';
+    } else {
+      item.style.top = '150%';
+      item.style.transform = 'translate(-50%, -50%)';
+    }
+  });
+
+  updateAboutCarousel();
+</script>
+
+</body>
+</html>
+
+<script>
+  document.getElementById('newsletter-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const messageBox = document.getElementById('newsletter-message');
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        messageBox.textContent = "✅ Subscribed successfully!";
+        e.target.reset();
+      } else {
+        messageBox.textContent = "❌ " + data.message;
+      }
+    } catch (err) {
+      messageBox.textContent = "❌ Server error. Please try again.";
+    }
+  });
+</script>

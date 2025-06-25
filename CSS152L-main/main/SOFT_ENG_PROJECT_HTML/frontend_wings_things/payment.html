@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #fafafa;
+      color: #222;
+      display: flex;
+      min-height: 100vh;
+      justify-content: center;
+    }
+
+    .container {
+      display: flex;
+      max-width: 1200px;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+      gap: 30px;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+
+    .payment-form {
+      flex: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 2.2rem;
+      color: #9e0909;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    input {
+      padding: 10px 12px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+      outline-offset: 2px;
+      outline-color: transparent;
+      transition: outline-color 0.2s ease;
+    }
+
+    input:focus {
+      outline-color: #9e0909;
+      border-color: #9e0909;
+    }
+
+    .card-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .pay-button {
+      margin-top: 20px;
+      background-color: #9e0909;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      padding: 15px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .pay-button:hover {
+      background-color: #5c0000;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+      color: green;
+      min-height: 20px;
+    }
+
+    .error-message {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #cc0000;
+      min-height: 20px;
+    }
+
+    .sidebar {
+      flex: 1;
+      background: #f3f4f6;
+      border-left: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 0 12px 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .sidebar h2 {
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-top: 0;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+      color: #333;
+    }
+
+    .item-summary {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .item-summary img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: white;
+      flex-shrink: 0;
+    }
+
+    .item-summary-details {
+      flex: 1;
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .item-summary-details strong {
+      display: block;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 3px;
+    }
+
+    .total {
+      margin-top: auto;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #9e0909;
+      text-align: right;
+      border-top: 1px solid #ccc;
+      padding-top: 15px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      body, .container {
+        flex-direction: column;
+        padding: 20px;
+      }
+      .sidebar {
+        border-left: none;
+        border-top: 1px solid #ddd;
+        border-radius: 12px 12px 0 0;
+        order: 2;
+      }
+      .payment-form {
+        order: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="payment-form">
+      <h1>Payment Details</h1>
+      <form id="paymentForm" novalidate>
+        <div>
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" placeholder="John Doe" required />
+        </div>
+
+        <div>
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="john@example.com" required />
+        </div>
+
+        <div>
+          <label for="address">Street Address</label>
+          <input type="text" id="address" name="address" placeholder="123 Main St" required />
+        </div>
+
+        <div>
+          <label for="city">City</label>
+          <input type="text" id="city" name="city" placeholder="Manila" required />
+        </div>
+
+        <div>
+          <label for="province">Province/State</label>
+          <input type="text" id="province" name="province" placeholder="Metro Manila" required />
+        </div>
+
+        <div>
+          <label for="postal">Postal Code</label>
+          <input type="text" id="postal" name="postal" placeholder="1000" required />
+        </div>
+
+        <div class="card-section">
+          <label for="cardNumber">Credit Card Number</label>
+          <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required pattern="[\d ]{13,19}" inputmode="numeric" />
+
+          <label for="expiry">Expiration Date (MM/YY)</label>
+          <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])\/\d{2}" required />
+
+          <label for="cvc">CVC</label>
+          <input type="text" id="cvc" name="cvc" placeholder="123" maxlength="4" pattern="\d{3,4}" required />
+        </div>
+
+        <button type="submit" class="pay-button">Pay Now</button>
+        <div id="message" class="message" aria-live="polite"></div>
+        <div id="errorMessage" class="error-message" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <aside class="sidebar">
+      <h2>Order Summary</h2>
+      <div id="orderItems"></div>
+      <div id="orderTotal" class="total"></div>
+    </aside>
+  </div>
+
+  <script>
+    // Load cart items from localStorage
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    const orderItemsContainer = document.getElementById('orderItems');
+    const orderTotalContainer = document.getElementById('orderTotal');
+    const paymentForm = document.getElementById('paymentForm');
+    const messageBox = document.getElementById('message');
+    const errorMessageBox = document.getElementById('errorMessage');
+
+    function renderOrderSummary() {
+      if (cart.length === 0) {
+        orderItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+        orderTotalContainer.textContent = '';
+        return;
+      }
+
+      orderItemsContainer.innerHTML = '';
+      let total = 0;
+
+      cart.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item-summary';
+
+        itemDiv.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" />
+          <div class="item-summary-details">
+            <strong>${item.name}</strong>
+            <span>${item.type} | ${item.quantity} pcs × ${item.count}</span><br />
+            <span>₱${item.subtotal.toFixed(2)}</span>
+          </div>
+        `;
+
+        orderItemsContainer.appendChild(itemDiv);
+        total += item.subtotal;
+      });
+
+      orderTotalContainer.textContent = `Total: ₱${total.toFixed(2)}`;
+    }
+
+    renderOrderSummary();
+
+    paymentForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      messageBox.textContent = '';
+      errorMessageBox.textContent = '';
+
+      if (cart.length === 0) {
+        errorMessageBox.textContent = 'Your cart is empty.';
+        return;
+      }
+
+      const formData = {
+        name: paymentForm.name.value.trim(),
+        email: paymentForm.email.value.trim(),
+        address: paymentForm.address.value.trim(),
+        city: paymentForm.city.value.trim(),
+        province: paymentForm.province.value.trim(),
+        postal: paymentForm.postal.value.trim(),
+        cardNumber: paymentForm.cardNumber.value.trim(),
+        expiry: paymentForm.expiry.value.trim(),
+        cvc: paymentForm.cvc.value.trim(),
+        cart: cart
+      };
+
+      // Basic client-side validation
+      if (!formData.name || !formData.email || !formData.address || !formData.city
+          || !formData.province || !formData.postal || !formData.cardNumber || !formData.expiry || !formData.cvc) {
+        errorMessageBox.textContent = 'Please complete all fields.';
+        return;
+      }
+
+      try {
+        messageBox.textContent = 'Processing payment... please wait.';
+
+        // Send POST request to backend payment API
+        const response = await fetch('/api/payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'Payment failed');
+        }
+
+        const result = await response.json();
+
+        // Payment success
+        messageBox.textContent = 'Payment successful! Redirecting...';
+
+        // Clear cart and redirect after a short delay
+        localStorage.removeItem('cart');
+        setTimeout(() => {
+          window.location.href = 'thank-you.html'; // Redirect to a thank you page
+        }, 2000);
+
+      } catch (error) {
+        messageBox.textContent = '';
+        errorMessageBox.textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>

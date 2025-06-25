@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: 'Merriweather', serif;
+        }
+        .header {
+            width: 100%;
+            height: 84px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.90);
+        }
+        .main-content {
+            padding-top: 84px; /* Add padding equal to header height */
+        }
+        
+        .scroll-to-top {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 56px;
+            height: 56px;
+            background: #00809D;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 9999;
+        }
+        .scroll-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    
+    <div style="width: 100%; min-height: 100vh; position: relative; background: #F8ECEC; overflow-x: hidden;">
+    
+    <!-- HEADER (Toolbar) -->
+    <div class="header">
+        <!-- hamburger -->
+        <a href="../MAIN PAGE/sample.html" style="width: 40px; height: 40px; position: absolute; top: 22px; left: 41px; display: flex; align-items: center; justify-content: center;">
+            <img src="../images/Adobe Express - file (1).png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;"/>
+        </a>
+        
+        <nav style="position: absolute; top: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 80px; align-items: center;">
+            <a href="../MENU/what'snew.html" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">WHAT'S NEW</a>
+            <a href="../MENU/menu.html" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">MENU</a>
+            <a href="../SOFT_ENG_PROJECT_HTML/frontend_wings_things/wings.html" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">WINGS</a>
+            <a href="#things" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">THINGS</a>
+            <a href="#bulk-order" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">BULK ORDER</a>
+            <a href="../MAIN PAGE/sample.html#about-section" id="about-us-link" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">ABOUT US</a>
+        </nav>
+
+    </div>
+
+    <!-- MAIN IMAGE SECTION -->
+    <div style="position: relative;">
+        <img src="../images/main page/d979b37c-cd0f-416f-8d05-1f83ab54e1dd.jpg"
+            style="width: 100%; height: 540px; object-fit: cover; position: relative; z-index: 1;" />
+        <div style="position: absolute; top: 65%; left: 50%; transform: translate(-50%, -50%); z-index: 2; text-align: center;">
+            <h1 style="font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 20px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin: 0; letter-spacing: 2px;">
+                WHERE FLAVOR MEETS FIRE
+            </h1>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- MENU LIST -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 50px; padding: 50px 0;">
+            <div style="display: flex; justify-content: center; gap: 100px;">
+                <img style="width: 716px; height: 965px;" src="../images/menu/1.PNG" />
+                <img style="width: 716px; height: 965px;" src="../images/menu/2.PNG" />
+            </div>
+            <div style="display: flex; justify-content: center; gap: 100px;">
+                <img style="width: 716px; height: 965px;" src="../images/menu/3.PNG" />
+                <img style="width: 716px; height: 965px;" src="../images/menu/4.PNG" />
+            </div>
+            <div style="display: flex; justify-content: center; gap: 100px;">
+                <img style="width: 716px; height: 965px;" src="../images/menu/5.PNG" />
+                <img style="width: 716px; height: 965px;" src="../images/menu/6.PNG" />
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer style="background-color: #00809D; color: white; padding: 40px 20px;">
+        <div style="max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+            <!-- Logo -->
+            <div style="flex: 1; min-width: 150px; text-align: center;">
+                <img src="../images/logo.png" alt="B Logo" style="height: 250px;">
+            </div>
+            <!-- Socials / Contact Info -->
+            <div style="flex: 1; min-width: 250px; text-align: center;">
+                <h4 style="font-family: 'Montserrat', sans-serif; font-weight: 700;">GET IN TOUCH</h4>
+                <p style="margin: 10px 0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align: middle; margin-right: 5px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="#fff"/><polyline points="22,6 12,13 2,6" stroke="#00809D" stroke-width="2" fill="none"/></svg>
+                johndoe@gmail.com
+                </p>
+                <p>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align: middle; margin-right: 5px;"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.21.49 2.53.76 3.88.76a1 1 0 011 1V20a1 1 0 01-1 1C10.07 21 3 13.93 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.35.27 2.67.76 3.88a1 1 0 01-.21 1.11l-2.2 2.2z" fill="#00809D" stroke="#fff" stroke-width="2"/></svg>
+                0912345678912
+                </p>
+            </div>
+            <!-- Newsletter Signup -->
+            <div style="flex: 1; min-width: 280px; text-align: center;">
+                <h4 style="font-family: 'Montserrat', sans-serif; font-weight: 700;">NEWSLETTER SIGN-UP</h4>
+                <p style="font-size: 14px;">Subscribe to our newsletter to receive our offers</p>
+                <form id="footer-newsletter-form" style="margin-top: 10px; display: flex; justify-content: center;">
+                    <input type="email" name="email" placeholder="Your email address" required
+                        style="padding: 10px; border-radius: 9999px 0 0 9999px; border: none; outline: none; width: 200px;">
+                    <button type="submit"
+                            style="padding: 10px 20px; background: #FF6060; color: white; border: none; border-radius: 0 9999px 9999px 0; font-weight: 600; cursor: pointer;">
+                        Subscribe
+                    </button>
+                </form>
+                <p id="footer-newsletter-msg" style="margin-top: 10px; font-size: 13px;"></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTopBtn" aria-label="Scroll to top">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="14" fill="none"/>
+            <path d="M14 20V8M14 8L8 14M14 8L20 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <script>
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        });
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

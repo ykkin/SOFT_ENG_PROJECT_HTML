@@ -1,0 +1,9 @@
+
+
+
+
+
+
+what to fix:
+1. add a scroll bar to the list
+2. some buttons cant be selected or unselect

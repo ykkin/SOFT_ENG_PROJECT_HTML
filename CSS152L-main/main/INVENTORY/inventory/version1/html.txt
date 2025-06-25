@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management</title>
+  <link rel="stylesheet" href="Inventory.css">
+</head>
+<body>
+    <div class="container">
+      <div class="header">
+        <h1>INVENTORY</h1>
+        <div class="search-bar">
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" placeholder="Search...">
+        </div>
+      </div>
+      <div class="content">
+        <div class="actions">
+          <button class="delete-btn">
+            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Delete
+          </button>
+          <div class="right-actions">
+            <button class="export-btn">
+              <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Export
+            </button>
+            <button class="add-btn">
+              <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" style="color: white; margin-right: 5px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add item
+            </button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 5%">
+                <div class="checkbox" id="select-all"></div>
+              </th>
+              <th style="width: 30%; cursor: pointer;" onclick="sortTable(1, 'name')">NAME <span>▼</span></th>
+              <th style="width: 20%; cursor: pointer;" onclick="sortTable(2, 'quantity')">QUANTITY <span>▼</span></th>
+              <th style="width: 20%; cursor: pointer;" onclick="sortTable(3, 'price')">PRICE <span>▼</span></th>
+              <th style="width: 25%; cursor: pointer;" onclick="sortTable(4, 'date')">DATE <span>▼</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 1</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 2</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 3</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 4</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 5</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 6</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 7</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 8</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="checkbox"></div>
+              </td>
+              <td>Item 9</td>
+              <td>100</td>
+              <td>100</td>
+              <td>1/1/2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <script>
+      // Data structure to maintain sorting state
+      let sortState = {
+        name: { direction: 'asc', active: false },
+        quantity: { direction: 'asc', active: false },
+        price: { direction: 'asc', active: false },
+        date: { direction: 'asc', active: false }
+      };
+      
+      // Function to toggle checkbox state
+      function toggleCheckbox(checkbox) {
+        checkbox.classList.toggle('checked');
+        const row = checkbox.closest('tr');
+        if (row) {
+          row.classList.toggle('selected');
+        }
+      }
+  
+      // Add click event listeners to checkboxes
+      document.querySelectorAll('.checkbox').forEach(checkbox => {
+        checkbox.addEventListener('click', function() {
+          if (this.id === 'select-all') {
+            const isChecked = this.classList.contains('checked');
+            document.querySelectorAll('tbody .checkbox').forEach(cb => {
+              if (isChecked) {
+                cb.classList.remove('checked');
+                cb.closest('tr').classList.remove('selected');
+              } else {
+                cb.classList.add('checked');
+                cb.closest('tr').classList.add('selected');
+              }
+            });
+            toggleCheckbox(this);
+          } else {
+            toggleCheckbox(this);
+            
+            // Update select-all checkbox based on individual checkboxes
+            const totalCheckboxes = document.querySelectorAll('tbody .checkbox').length;
+            const checkedCheckboxes = document.querySelectorAll('tbody .checkbox.checked').length;
+            const selectAllCheckbox = document.getElementById('select-all');
+            
+            if (checkedCheckboxes === totalCheckboxes) {
+              selectAllCheckbox.classList.add('checked');
+            } else {
+              selectAllCheckbox.classList.remove('checked');
+            }
+          }
+        });
+      });
+      
+      // Function to sort table
+      function sortTable(columnIndex, columnName) {
+        const table = document.querySelector('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Reset all column headers
+        document.querySelectorAll('th span').forEach(span => {
+          span.textContent = '▼';
+        });
+        
+        // Toggle sort direction for the clicked column
+        sortState[columnName].direction = sortState[columnName].active ? 
+          (sortState[columnName].direction === 'asc' ? 'desc' : 'asc') : 'asc';
+        
+        // Mark this column as active
+        Object.keys(sortState).forEach(key => {
+          sortState[key].active = (key === columnName);
+        });
+        
+        // Update the sort indicator
+        const headerSpan = document.querySelectorAll('th span')[columnIndex - 1];
+        headerSpan.textContent = sortState[columnName].direction === 'asc' ? '▲' : '▼';
+        
+        // Sort the rows
+        rows.sort((a, b) => {
+          let aValue = a.cells[columnIndex].textContent.trim();
+          let bValue = b.cells[columnIndex].textContent.trim();
+          
+          // For numeric columns (quantity and price)
+          if (columnName === 'quantity' || columnName === 'price') {
+            aValue = parseFloat(aValue);
+            bValue = parseFloat(bValue);
+            return sortState[columnName].direction === 'asc' ? aValue - bValue : bValue - aValue;
+          }
+          // For date column
+          else if (columnName === 'date') {
+            const aDate = new Date(aValue);
+            const bDate = new Date(bValue);
+            return sortState[columnName].direction === 'asc' ? aDate - bDate : bDate - aDate;
+          }
+          // For text column (name)
+          else {
+            return sortState[columnName].direction === 'asc' ? 
+              aValue.localeCompare(bValue) : 
+              bValue.localeCompare(aValue);
+          }
+        });
+        
+        // Remove all existing rows
+        rows.forEach(row => tbody.removeChild(row));
+        
+        // Add sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+      }
+    </script>
+  </body>
+</html>

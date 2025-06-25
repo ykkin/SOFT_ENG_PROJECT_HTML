@@ -1,0 +1,8 @@
+
+
+
+
+added:
+1. added a delete function
+2. fixed checkbox selection functionality
+3. working search bar

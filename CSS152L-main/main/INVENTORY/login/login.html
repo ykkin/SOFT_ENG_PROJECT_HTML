@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Form</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+    .input-container {
+      position: relative;
+      width: 374px;
+    }
+
+    .eye-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .eye-icon:hover {
+      opacity: 1;
+    }
+
+    .eye-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .login-btn {
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .login-btn:hover {
+      background: #FF4040 !important;
+    }
+  </style>
+</head>
+<body>
+  <div style="width: 1890px; height: 1080px; position: relative; background: #F2EBEB; overflow: hidden;">
+    <div style="width: 490px; height: 550px; left: 715px; top: 219px; position: absolute; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"></div>
+    <div style="left: 871px; top: 324px; position: absolute; text-align: center; color: black; font-size: 32px; font-weight: 700; line-height: 32px; word-wrap: break-word">WELCOME!</div>
+    <div style="left: 873px; top: 368px; position: absolute; opacity: 0.70; text-align: center; color: black; font-size: 16px; font-weight: 400; line-height: 16px; word-wrap: break-word">Sign in to your account</div>
+    <a href="reset.html" style="left: 994px; top: 632px; position: absolute; opacity: 0.70; text-align: center; color: #0F34CA; font-size: 16px; font-weight: 400; line-height: 16px; cursor: pointer; text-decoration: none;">forgot password?</a>
+    <a href="register.html" style="left: 773px; top: 632px; position: absolute; opacity: 0.70; text-align: center; color: #0F34CA; font-size: 16px; font-weight: 400; line-height: 16px; cursor: pointer; text-decoration: none;">create account</a>
+    <div style="left: 773px; top: 436px; position: absolute; opacity: 0.70; text-align: center; color: black; font-size: 16px; font-weight: 400; line-height: 16px; word-wrap: break-word">Email</div>
+    <div style="left: 773px; top: 557px; position: absolute; opacity: 0.70; text-align: center; color: black; font-size: 16px; font-weight: 400; line-height: 16px; word-wrap: break-word">Password</div>
+    
+    <!-- Logo --> 
+    <img style="width: 192px; height: 192px; left: 858px; top: 184px; position: absolute; object-fit: contain;" src="/main/images/logo.png" alt="Logo" />
+    
+    <!-- Email input -->
+    <div style="width: 374px; height: 0px; left: 773px; top: 496px; position: absolute; outline: 1px black solid; outline-offset: -0.50px;"></div>
+    <div class="input-container" style="left: 773px; top: 456px; position: absolute;">
+      <input id="email-input" type="text" style="width: 354px; height: 40px; border: none; outline: none; background: transparent; font-size: 16px; color: black; padding-right: 20px;" placeholder="Enter your email" />
+      <div id="email-eye" class="eye-icon" onclick="toggleVisibility('email')">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Password input -->
+    <div style="width: 374px; height: 0px; left: 773px; top: 617px; position: absolute; outline: 1px black solid; outline-offset: -0.50px;"></div>
+    <div class="input-container" style="left: 773px; top: 577px; position: absolute;">
+      <input id="password-input" type="password" style="width: 354px; height: 40px; border: none; outline: none; background: transparent; font-size: 16px; color: black; padding-right: 20px;" placeholder="Enter your password" />
+      <div id="password-eye" class="eye-icon" onclick="toggleVisibility('password')">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Login button -->
+    <div class="login-btn" style="width: 210px; height: 40px; left: 855px; top: 708px; position: absolute; background: #FF6060; border-radius: 15px; display: flex; justify-content: center; align-items: center;" onclick="handleLogin()">
+        <div style="text-align: center; color: white; font-size: 25px; font-weight: 700; line-height: 32px; word-wrap: break-word">LOGIN</div>
+    </div>
+  </div>    
+
+  <script>
+    function toggleVisibility(fieldId) {
+      const input = document.getElementById(`${fieldId}-input`);
+      const eyeIcon = document.getElementById(`${fieldId}-eye`);
+
+      if (input.type === 'password') {
+        // Show password
+        input.type = 'text';
+        eyeIcon.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4.27L3.28 3L20.73 20.45L19.45 21.72L15.8 18.07C14.6 18.67 13.33 19 12 19C7 19 2.73 15.89 1 11.5C1.69 9.24 3.08 7.24 5 5.82L2 2.82L2 4.27ZM12 5C17 5 21.27 8.11 23 12.5C22.18 14.94 20.82 16.24 19.17 17.19L17.58 15.6C18.42 14.81 19 13.54 19 12C19 8.69 16.31 6 13 6C11.46 6 10.06 6.58 9.27 7.42L7.68 5.83C9.14 4.85 10.53 4.27 12 5ZM12 7C14.76 7 17 9.24 17 12C17 12.64 16.87 13.26 16.64 13.82L14.18 11.36C14.07 10.74 13.64 10.18 13.01 9.82L10.55 7.36C11.11 7.13 11.73 7 12 7Z" fill="currentColor"/>
+          </svg>
+        `;
+      } else {
+        // Hide password
+        input.type = 'password';
+        eyeIcon.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z" fill="currentColor"/>
+          </svg>
+        `;
+      }
+    }
+
+    function handleLogin() {
+      const email = document.getElementById('email-input').value;
+      const password = document.getElementById('password-input').value;
+      
+      if (email && password) {
+        // Send login request to backend
+        fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+          } else {
+            // Login successful, redirect to inventory page
+            window.location.href = '../inventory/Inventory.html';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred during login. Please try again.');
+        });
+      } else {
+        alert('Please enter both email and password');
+      }
+    }
+  </script>
+</body>
+</html>

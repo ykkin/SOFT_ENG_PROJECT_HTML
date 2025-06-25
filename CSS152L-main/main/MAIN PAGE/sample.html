@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: 'Merriweather', serif;
+        }
+        .header {
+            width: 100%;
+            height: 84px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.90);
+        }
+        .main-content {
+            padding-top: 84px; /* Add padding equal to header height */
+        }
+        .card-container {
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        .card-container:hover {
+            transform: scale(1.02);
+        }
+        .card-image {
+            border-radius: 25px;
+            transition: filter 0.3s ease;
+        }
+        .card-container:hover .card-image {
+            filter: blur(1.2px);
+        }
+        .card-label {
+            width: 180px;
+            height: 50px;
+            position: absolute;
+            background: #143663;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card-container:hover .card-label {
+            transform: scale(1.1);
+            background: #9e0909;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .label-text {
+            text-align: center;
+            color: rgb(255, 255, 255);
+            font-size: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            line-height: 20px;
+            transition: all 0.3s ease;
+        }
+        .card-container:hover .label-text {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        .best-seller {
+            width: 100%;
+            height: 450px;
+            /* background: #FF6060; */
+            position: relative;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .carousel-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .carousel-item {
+            position: absolute;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateX(-50%) scale(0.8);
+        }
+        .carousel-item img {
+            border-radius: 15px;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .carousel-item .item-label {
+            position: static;
+            margin-top: 18px;
+            opacity: 1;
+            background: none;
+            color: #222;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            text-align: center;
+        }
+        .carousel-item .item-label .title {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 2px;
+            width: 100%;
+            text-align: center;
+        }
+        .carousel-item .item-label .subtitle {
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            width: 100%;
+            text-align: center;
+        }
+        .carousel-item.active {
+            z-index: 2;
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+        .carousel-item.active img {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .carousel-item.active .item-label {
+            opacity: 1;
+            bottom: -60px;
+        }
+        .carousel-item:not(.active) {
+            filter: blur(2px);
+            opacity: 0.7;
+        }
+        .carousel-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 3;
+            margin-top: 40px;
+        }
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .carousel-dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* About section elements - initially hidden */
+        .about-element {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .about-element.left {
+            transform: translateX(-30px);
+        }
+
+        .about-element.right {
+            transform: translateX(30px);
+        }
+
+        /* Animated state classes */
+        .about-element.animate {
+            opacity: 1;
+            transform: translateY(0) translateX(0);
+        }
+
+        .about-element.animate.delay-1 {
+            transition-delay: 0.2s;
+        }
+
+        .about-element.animate.delay-2 {
+            transition-delay: 0.4s;
+        }
+
+        .about-element.animate.delay-3 {
+            transition-delay: 0.6s;
+        }
+
+        .about-element.animate.delay-4 {
+            transition-delay: 0.8s;
+        }
+
+        .about-element.animate.delay-5 {
+            transition-delay: 1s;
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 56px;
+            height: 56px;
+            background: #00809D;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 9999;
+        }
+        .scroll-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .carousel-card-bg {
+            background: #FF7C7C;
+            border-radius: 40px;
+            padding: 32px 24px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            width: 480px;
+            height: 350px;
+            position: relative;
+        }
+        .carousel-card-bg img {
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+        }
+        .carousel-card-bg .item-label {
+            text-align: center;
+            width: 100%;
+        }
+        .carousel-card-bg .item-label .title {
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            margin-bottom: 0;
+        }
+        .carousel-card-bg .item-label .subtitle {
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+        .carousel-wrapper {
+            overflow: hidden;
+            width: 900px;
+            height: 350px;
+            position: relative;
+        }
+        .carousel-seamless {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            animation: seamless-scroll 18s linear infinite;
+        }
+        @keyframes seamless-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-1440px); }
+        }
+    </style>
+</head>
+<body>
+    
+    <div style="width: 100%; min-height: 100vh; position: relative; background: #F8ECEC; overflow-x: hidden;">
+    
+    <!-- HEADER (Toolbar) -->
+    <div class="header">
+        <!-- hamburger/logo -->
+        <a href="../MAIN PAGE/sample.html" style="width: 40px; height: 40px; position: absolute; top: 22px; left: 41px; display: flex; align-items: center; justify-content: center;">
+            <img src="../images/Adobe Express - file (1).png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;"/>
+        </a>
+        
+        <!-- search bar replaced with navigation links -->
+        <nav style="position: absolute; top: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 80px; align-items: center;">
+            <a href="../MENU/what'snew.html" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">WHAT'S NEW</a>
+            <a href="../MENU/menu.html" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">MENU</a>
+            <a href="../SOFT_ENG_PROJECT_HTML/frontend_wings_things/wings.html" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">WINGS</a>
+            <a href="#things" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">THINGS</a>
+            <a href="#bulk-order" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">BULK ORDER</a>
+            <a href="../MAIN PAGE/sample.html#about-section" id="about-us-link" style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 18px; color: #1E1E1E; text-decoration: none;">ABOUT US</a>
+        </nav>
+        <!-- removed search bar -->
+
+    </div>
+
+    <div class="main-content">
+        <!-- MAIN IMAGE SECTION -->
+        <div style="position: relative;">
+            <img src="../images/main page/d979b37c-cd0f-416f-8d05-1f83ab54e1dd.jpg"
+                style="width: 100%; height: 540px; object-fit: cover; position: relative; z-index: 1;" />
+            <div style="position: absolute; top: 65%; left: 50%; transform: translate(-50%, -50%); z-index: 2; text-align: center;">
+                <h1 style="font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 20px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin: 0; letter-spacing: 2px;">
+                    WHERE FLAVOR MEETS FIRE
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards Section -->
+    <div style="position: relative; height: 600px; margin-top: 40px;">
+        <div class="card-container" style="position: absolute; left: 262px; top: 0;">
+            <a href="../MENU/what'snew.html" style="text-decoration: none;">
+                <img class="card-image" style="width: 350px; height: 428px;" src="../images/main page/117944378_10158540755414547_1326503116057793675_n.jpg" />
+                <div class="card-label" style="left: 65px; top: 368px; height: 35px;">
+                    <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;">WHAT'S NEW</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-container" style="position: absolute; left: 626px; top: 0;">
+            <a href="../MENU/menu.html" style="text-decoration: none;">
+                <img class="card-image" style="width: 342px; height: 195px;" src="../images/main page/7235285.JPG" />
+                <div class="card-label" style="left: 81px; top: 145px; height: 35px;">
+                    <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;">MENU</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-container" style="position: absolute; left: 982px; top: 0;">
+            <a href="../SOFT_ENG_PROJECT_HTML/frontend_wings_things/wings.html">
+                <img class="card-image" style="width: 304px; height: 426px;" src="../images/main page/485141724_10162314528994547_3645822391865856742_n.jpg" />
+                <div class="card-label" style="left: 62px; top: 368px; height: 35px;">
+                    <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;"">WINGS</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card-container" style="position: absolute; left: 1300px; top: 0;">
+            <img class="card-image" style="width: 304px; height: 426px;" src="../images/main page/485800460_10162319934894547_8630561960821771825_n.jpg" />
+            <div class="card-label" style="left: 62px; top: 368px; height: 35px;">
+                <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;"">THINGS</div>
+            </div>
+        </div>
+
+        <div class="card-container" style="position: absolute; left: 626px; top: 224px;">
+            <img class="card-image" style="width: 342px; height: 204px;" src="../images/main page/1485141724_10162314528994547_3645822391865856742_n.jpg" />
+            <div class="card-label" style="left: 81px; top: 144px; height: 35px;">
+                <div class="label-text" style="font-size: 16px; font-family: 'Montserrat', sans-serif;"">BULK ORDER</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEST SELLER -->
+    <div class="best-seller" style="position: relative; top: 0; margin-top: 0px; display: flex; align-items: center; height: 450px;">
+        <div style="position: absolute; left: 200px; top: 50%; transform: translateY(-50%); z-index: 3;">
+            <div style="font-family: 'Montserrat', sans-serif; font-size: 80px; color: rgb(0, 0, 0); line-height: 1;">
+                <span style="font-weight: 400;">BEST</span><br/>
+                <span style="font-weight: 700;">SELLER</span>
+            </div>
+        </div>
+        <div style="margin-left: 600px; width: 900px; overflow: hidden; position: relative; height: 450px;">
+            <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
+                <!-- Indicators -->
+                <ol class="carousel-indicators">
+                    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                    <li data-target="#myCarousel" data-slide-to="1"></li>
+                    <li data-target="#myCarousel" data-slide-to="2"></li>
+                    <li data-target="#myCarousel" data-slide-to="3"></li>
+                    <li data-target="#myCarousel" data-slide-to="4"></li>
+                </ol>
+                <!-- Wrapper for slides -->
+                <div class="carousel-inner">
+                    <div class="item active">
+                        <img src="../images/best seller/NY_STYLE_CHEESEBURGER.jpg" alt="Go Solo" style="width:100%; height:450px; object-fit:cover; border-radius:20px;">
+                        <div class="carousel-caption">
+                            <h3>NY STYLE</h3>
+                            <p>CHEESEBURGER</p>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <img src="../images/best seller/NACHOS.jpg" alt="Make it Double" style="width:100%; height:450px; object-fit:cover; border-radius:20px;">
+                        <div class="carousel-caption">
+                            <h3>NACHOS</h3>
+                            <p>ORIGINAL CHICKEN FINGERS</p>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <img src="../images/best seller/FRIED_CHICKEN_PLATE.jpg" alt="Cheeseburger" style="width:100%; height:450px; object-fit:cover; border-radius:20px;">
+                        <div class="carousel-caption">
+                            <h3>FRIED CHICKEN</h3>
+                            <p>PLATE</p>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <img src="../images/best seller/CHICKEN_SANDWICHES_DALAWA.jpg" alt="Classic Cheeseburger" style="width:100%; height:450px; object-fit:cover; border-radius:20px;">
+                        <div class="carousel-caption">
+                            <h3>CHICKEN SANDWICH</h3>
+                            <p>DALAWA</p>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <img src="../images/best seller/CAJUN_PASTIU.jpg" alt="New York's Finest" style="width:100%; height:450px; object-fit:cover; border-radius:20px;">
+                        <div class="carousel-caption">
+                            <h3>CAJU PASTIU</h3>
+                            <p>PREMIUM BURGER</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Left and right controls -->
+                <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+ 
+    <!-- ABOUT US -->
+    <div id="about-section" style="width: 1920px; height: 1080px; position: relative; background: #ffffff">
+        <div style="width: 1672px; height: 981px; left: 131px; top: 99px; position: absolute; background: #FFCFCF"></div>
+        <div style="width: 622px; height: 422px; left: 0px; top: 11px; position: absolute; opacity: 0.20" class="about-element delay-1"></div>
+        
+        <div style="width: 366px; height: 287px; left: 579px; top: 214px; position: absolute; text-align: right; color: black; font-size: 64px; font-family: Montserrat; font-weight: 700; line-height: 64px; word-wrap: break-word; text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25)" class="about-element right delay-2">
+            THIS IS<br/>WHO<br/>WE<br/>ARE
+        </div>
+        
+        <div style="width: 344px; height: 179px; left: 981px; top: 511px; position: absolute; color: black; font-size: 64px; font-family: Montserrat; font-weight: 700; line-height: 64px; word-wrap: break-word; text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25)" class="about-element left delay-3">
+            IT'S MORE<br/>THAN<br/>WINGS
+        </div>
+        
+        <div style="width: 804px; left: 579px; top: 803px; position: absolute; color: black; font-size: 64px; font-family: Montserrat; font-weight: 700; line-height: 64px; word-wrap: break-word; text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25)" class="about-element delay-4">
+            POWERED BY PASSION
+        </div>
+        
+        <div style="width: 575px; height: 348px; left: 981px; top: 197px; position: absolute; color: rgba(0, 0, 0, 0.85); font-size: 28px; font-family: Lora; font-weight: 400; line-height: 28px; word-wrap: break-word" class="about-element left delay-2">
+            <br/>Buffalo's Wings N' Things isn't just a restaurant. We're the team that brings the heat, the heart, and the hustle — one saucy bite at a time. Buffalo's Wings N' Things Assembly Grounds at The Rise opened its doors in 2019 with one goal in mind: to serve food that fires up your taste buds and brings people together.
+        </div>
+        
+        <div style="width: 575px; height: 348px; left: 370px; top: 488px; position: absolute; text-align: right; color: rgba(0, 0, 0, 0.85); font-size: 28px; font-family: Lora; font-weight: 400; line-height: 28px; word-wrap: break-word" class="about-element right delay-3">
+            <br/>We're not just known for our wings we're known for our saucy attitude. From our signature Champion Buffalo wings to hearty rice meals and game-day favorites, everything we serve is made fresh, bold, and packed with flavor. We believe good food should be exciting, satisfying, and something worth coming back for.
+        </div>
+        
+        <div style="width: 890px; height: 348px; left: 536px; top: 858px; position: absolute; text-align: center; color: rgba(0, 0, 0, 0.85); font-size: 28px; font-family: Lora; font-weight: 400; line-height: 28px; word-wrap: break-word" class="about-element delay-5">
+            <br/>Behind the scenes, we're a tight-knit team with a shared love for great food and great service. We take pride in creating a space where regulars feel at home, newcomers feel welcome, and every plate tells our story.
+        </div>
+        
+        <img style="width: 374px; height: 256px; left: 272px; top: 214px; position: absolute" src="../images/main page/1485141724_10162314528994547_3645822391865856742_n.jpg" class="about-element left delay-1" />
+        <img style="width: 359px; height: 253px; left: 1361px; top: 501px; position: absolute" src="../images/main page/117944378_10158540755414547_1326503116057793675_n.jpg" class="about-element right delay-3" />
+        
+        <div style="width: 687.03px; height: 0px; left: 257.99px; top: 498px; position: absolute; outline: 3px black solid; outline-offset: -1.50px" class="about-element delay-2"></div>
+        <div style="width: 739px; height: 0px; left: 981px; top: 772px; position: absolute; outline: 3px black solid; outline-offset: -1.50px" class="about-element delay-4"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer style="background-color: #00809D; color: white; padding: 40px 20px;">
+        <div style="max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+            <!-- Logo -->
+            <div style="flex: 1; min-width: 150px; text-align: center;">
+                <img src="../images/logo.png" alt="B Logo" style="height: 250px;">
+            </div>
+            <!-- Socials / Contact Info -->
+            <div style="flex: 1; min-width: 250px; text-align: center;">
+                <h4 style="font-family: 'Montserrat', sans-serif; font-weight: 700;">GET IN TOUCH</h4>
+                <p style="margin: 10px 0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align: middle; margin-right: 5px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="#fff"/><polyline points="22,6 12,13 2,6" stroke="#00809D" stroke-width="2" fill="none"/></svg>
+                johndoe@gmail.com
+                </p>
+                <p>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align: middle; margin-right: 5px;"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.21.49 2.53.76 3.88.76a1 1 0 011 1V20a1 1 0 01-1 1C10.07 21 3 13.93 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.35.27 2.67.76 3.88a1 1 0 01-.21 1.11l-2.2 2.2z" fill="#00809D" stroke="#fff" stroke-width="2"/></svg>
+                0912345678912
+                </p>
+            </div>
+            <!-- Newsletter Signup -->
+            <div style="flex: 1; min-width: 280px; text-align: center;">
+                <h4 style="font-family: 'Montserrat', sans-serif; font-weight: 700;">NEWSLETTER SIGN-UP</h4>
+                <p style="font-size: 14px;">Subscribe to our newsletter to receive our offers</p>
+                <form id="footer-newsletter-form" style="margin-top: 10px; display: flex; justify-content: center;">
+                    <input type="email" name="email" placeholder="Your email address" required
+                        style="padding: 10px; border-radius: 9999px 0 0 9999px; border: none; outline: none; width: 200px;">
+                    <button type="submit"
+                            style="padding: 10px 20px; background: #FF6060; color: white; border: none; border-radius: 0 9999px 9999px 0; font-weight: 600; cursor: pointer;">
+                        Subscribe
+                    </button>
+                </form>
+                <p id="footer-newsletter-msg" style="margin-top: 10px; font-size: 13px;"></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTopBtn" aria-label="Scroll to top">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="14" fill="none"/>
+            <path d="M14 20V8M14 8L8 14M14 8L20 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <!-- CAROUSEL SCRIPT -->
+    <script>
+        const carousel = document.querySelector('.carousel-container');
+        const items = document.querySelectorAll('.carousel-item');
+        const dots = document.querySelectorAll('.carousel-dot');
+        let currentIndex = 0;
+        let isAnimating = false;
+
+        function updateCarousel() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            items.forEach((item, index) => {
+                item.classList.remove('active');
+                if (index === currentIndex) {
+                    item.style.left = '50%';
+                    setTimeout(() => item.classList.add('active'), 50);
+                } else if (index === (currentIndex + 1) % items.length) {
+                    item.style.left = '150%';
+                } else {
+                    item.style.left = '-50%';
+                }
+            });
+
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+
+            setTimeout(() => {
+                isAnimating = false;
+            }, 800); 
+        }
+
+        function nextSlide() {
+            if (isAnimating) return;
+            currentIndex = (currentIndex + 1) % items.length;
+            updateCarousel();
+        }
+
+        // Auto-advance slides every 3 seconds
+        setInterval(nextSlide, 3000);
+
+        // Click handlers for dots
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                if (isAnimating || currentIndex === index) return;
+                currentIndex = index;
+                updateCarousel();
+            });
+        });
+
+        // Initial setup
+        updateCarousel();
+
+        // SCROLL-TRIGGERED ANIMATIONS FOR ABOUT SECTION
+        const aboutSection = document.getElementById('about-section');
+        const aboutElements = document.querySelectorAll('.about-element');
+        let aboutAnimationTriggered = false;
+
+        // Intersection Observer to detect when about section enters viewport
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -20% 0px', 
+            threshold: 0
+        };
+
+        const aboutObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !aboutAnimationTriggered) {
+                    aboutAnimationTriggered = true;
+                    
+                    aboutElements.forEach(element => {
+                        element.classList.add('animate');
+                    });
+                }
+            });
+        }, observerOptions);
+
+        aboutObserver.observe(aboutSection);
+
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                if (!aboutAnimationTriggered) {
+                    const aboutRect = aboutSection.getBoundingClientRect();
+                    const windowHeight = window.innerHeight;
+                    
+                    if (aboutRect.top < windowHeight * 0.8 && aboutRect.bottom > windowHeight * 0.2) {
+                        aboutAnimationTriggered = true;
+                        
+                        aboutElements.forEach(element => {
+                            element.classList.add('animate');
+                        });
+                    }
+                }
+            }, 10);
+        });
+
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        });
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+
+    <script>
+      document.getElementById('checkoutForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+          name: form.name.value,
+          email: form.email.value,
+          address: form.address.value,
+          city: form.city.value,
+          province: form.province.value,
+          postal: form.postal.value,
+          cardNumber: form.cardNumber.value,
+          expiry: form.expiry.value,
+          cvc: form.cvc.value,
+          cart: [{ name: 'Sample Item', quantity: 1, subtotal: 100 }] // Placeholder cart
+        };
+        document.getElementById('checkoutMsg').textContent = 'Processing...';
+        try {
+          const res = await fetch('http://127.0.0.1:3000/api/payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const result = await res.json();
+          if(res.ok) {
+            document.getElementById('checkoutMsg').textContent = 'Payment successful!';
+          } else {
+            document.getElementById('checkoutMsg').textContent = result.error || 'Payment failed.';
+          }
+        } catch (err) {
+          document.getElementById('checkoutMsg').textContent = 'Network error.';
+        }
+      }
+    </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const aboutUsLink = document.getElementById('about-us-link');
+        if (aboutUsLink) {
+          aboutUsLink.addEventListener('click', function(e) {
+            // Check if already on the main page (sample.html)
+            if (window.location.pathname.includes('sample.html')) {
+              e.preventDefault();
+              const aboutSection = document.getElementById('about-section');
+              if (aboutSection) {
+                aboutSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+            // If not on main page, let the link work as normal
+          });
+        }
+      });
+    </script>
+
+    <!-- Add Bootstrap JS and jQuery before </body> if not present -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</body>
+</html>
