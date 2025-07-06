@@ -6,7 +6,7 @@ const pool = new Pool({
   database: "postgres",
   user: "postgres.heceotsazrqtejxmbsux",
   pool_mode: "session",
-  password: "NickMakinoBitch",
+  password: "9QOc3onAnN!",
   ssl: {
     rejectUnauthorized: false  // required by Supabase
   }
